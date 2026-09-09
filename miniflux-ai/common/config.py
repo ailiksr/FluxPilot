@@ -44,7 +44,23 @@ class Config:
         self._validate_config_compatibility()
 
     def _get_config_value(self, section, key, default=None):
-        return self.c.get(section, {}).get(key, default)
+        val = self.c.get(section, {}).get(key)
+        if val is None or str(val).startswith("sk-your-") or str(val) == "your_api_key_here":
+            env_map = {
+                ("llm", "base_url"): ["AI_BASE_URL", "LLM_BASE_URL"],
+                ("llm", "api_key"): ["AI_API_KEY", "LLM_API_KEY"],
+                ("llm", "model"): ["AI_MODEL", "LLM_MODEL"],
+                ("miniflux", "base_url"): ["MINIFLUX_BASE_URL"],
+                ("miniflux", "api_key"): ["MINIFLUX_API_KEY"],
+                ("miniflux", "webhook_secret"): ["AI_WEBHOOK_SECRET", "MINIFLUX_WEBHOOK_SECRET"],
+            }
+            candidates = env_map.get((section, key), [f"{section.upper()}_{key.upper()}"])
+            for env_var in candidates:
+                env_val = os.getenv(env_var)
+                if env_val:
+                    return env_val
+            return default
+        return val
 
     def _load_agents(self) -> dict[str, Agent]:
         """
