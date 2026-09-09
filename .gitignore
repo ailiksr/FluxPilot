@@ -3,6 +3,8 @@
 .env.local
 .env.*.local
 miniflux-api-key
+config.yml
+config.yaml
 
 # Application runtime data & storage
 data/

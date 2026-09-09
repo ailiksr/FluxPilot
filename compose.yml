@@ -87,6 +87,7 @@ services:
       AI_WEBHOOK_SECRET: ${AI_WEBHOOK_SECRET:-}
     volumes:
       - ./data/ai-worker:/app/data
+      - ./config.yml:/app/config.yml:ro
     ports:
       - "${PORT_AI_CONSOLE:-18090}:80"
     healthcheck:
