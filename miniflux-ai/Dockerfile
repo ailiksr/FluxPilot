@@ -9,7 +9,8 @@ RUN pip3 install --no-cache-dir --index-url="$PIP_INDEX_URL" --prefix="/deps" -r
 
 # Stage 2: runtime image
 FROM python:3.11-slim-bookworm
-LABEL authors="serpicroon"
+LABEL org.opencontainers.image.source="https://github.com/ailiksr/FluxPilot"
+LABEL org.opencontainers.image.description="FluxPilot: All-in-one autonomous RSS intelligence reading infrastructure"
 WORKDIR /app
 RUN addgroup --system --gid 981 rssai \
     && adduser --system --no-create-home --uid 999 --ingroup rssai rssai

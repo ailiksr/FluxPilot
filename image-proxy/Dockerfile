@@ -1,4 +1,6 @@
 FROM python:3.11-alpine
+LABEL org.opencontainers.image.source="https://github.com/ailiksr/FluxPilot"
+LABEL org.opencontainers.image.description="Privacy-preserving image cache proxy for FluxPilot"
 WORKDIR /app
 RUN addgroup -S -g 981 rssai \
     && adduser -S -D -H -u 999 -G rssai rssai

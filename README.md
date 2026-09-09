@@ -129,32 +129,6 @@ docker compose up -d
 
 ---
 
-## 🔄 自动化更新 (Watchtower & Portainer 部署)
-
-### 方案 A：使用 Watchtower 全自动静默更新 (推荐)
-本项目镜像预置了 Watchtower 标签支持，仅对业务层（`miniflux-ai` 和 `image-proxy`）进行平滑自动更新，同时保护底层 PostgreSQL 数据库不被盲目重启：
-```yaml
-# 在宿主机运行 Watchtower
-docker run -d \
-  --name watchtower \
-  --restart unless-stopped \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  containrrr/watchtower \
-  --interval 3600 \
-  --cleanup \
-  --label-enable
-```
-当云端发布新版本时，Watchtower 将自动拉取新镜像并平滑重启业务容器，**所有数据与自愈规则完好继承，零人工介入**。
-
-### 方案 B：在 Portainer Stacks 中原生自动更新
-在 Portainer 中新建 Stack 时：
-1. 部署模式选择 **Repository (Git)**；
-2. 填入仓库地址：`https://github.com/ailiksr/FluxPilot`；
-3. Compose 路径填入：`compose.yml`；
-4. 开启 **Automatic Updates**（定时轮询或配置 Webhook），GitHub 有新更新时 Portainer 自动重构拉取！
-
----
-
 ## 🛠️ 本地二次开发 (Development)
 
 若你需要基于源码进行本地构建与二次开发，可以使用开发覆盖文件：

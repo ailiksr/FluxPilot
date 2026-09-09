@@ -12,8 +12,8 @@ _PUBLIC_PATHS = {"/healthz", "/api/miniflux-ai", "/rss/digest", "/rss/curated"}
 
 
 def _basic_credentials_valid() -> bool:
-    expected_user = os.environ.get("RSS_AI_ADMIN_USER", "").strip()
-    expected_password = os.environ.get("RSS_AI_ADMIN_PASSWORD", "")
+    expected_user = (os.environ.get("RSS_AI_ADMIN_USER") or os.environ.get("MINIFLUX_ADMIN_USER") or "").strip()
+    expected_password = os.environ.get("RSS_AI_ADMIN_PASSWORD") or os.environ.get("MINIFLUX_ADMIN_PASSWORD") or ""
     if not expected_user or not expected_password:
         return False
     header = request.headers.get("Authorization", "")
