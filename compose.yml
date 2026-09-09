@@ -1,0 +1,144 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    logging: &default-logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-miniflux}
+      POSTGRES_USER: ${POSTGRES_USER:-miniflux}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-miniflux_secret}
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks: [rss]
+
+  image-proxy:
+    image: ghcr.io/ailiksr/rss-ai-image-proxy:${TAG:-latest}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid
+    pids_limit: 64
+    cpus: "0.50"
+    mem_limit: 192m
+    stop_grace_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    logging: *default-logging
+    environment:
+      TIMEOUT: "30"
+      MAX_BYTES: "15728640"
+      MAX_CACHE_BYTES: "536870912"
+      ALLOW_SVG: "0"
+    volumes:
+      - ./data/image-proxy:/cache
+    ports:
+      - "${BIND_IP:-0.0.0.0}:${PORT_IMAGE_PROXY:-18091}:8080"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks: [rss]
+
+  miniflux:
+    image: miniflux/miniflux:2.2.3
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      postgres:
+        condition: service_healthy
+      image-proxy:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-miniflux}:${POSTGRES_PASSWORD:-miniflux_secret}@postgres:5432/${POSTGRES_DB:-miniflux}?sslmode=disable
+      RUN_MIGRATIONS: "1"
+      CREATE_ADMIN: "1"
+      ADMIN_USERNAME: ${MINIFLUX_ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${MINIFLUX_ADMIN_PASSWORD:-admin_secret}
+      BASE_URL: http://${HOST_IP:-127.0.0.1}:${PORT_MINIFLUX:-18080}
+      INTEGRATION_ALLOW_PRIVATE_NETWORKS: "1"
+      FETCHER_ALLOW_PRIVATE_NETWORKS: "1"
+      TZ: ${TZ:-Asia/Shanghai}
+      MEDIA_PROXY_MODE: none
+      HTTP_CLIENT_USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36
+    ports:
+      - "${BIND_IP:-0.0.0.0}:${PORT_MINIFLUX:-18080}:8080"
+    healthcheck:
+      test: ["CMD", "/usr/bin/miniflux", "-healthcheck", "auto"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks: [rss]
+
+  miniflux-ai:
+    image: ghcr.io/ailiksr/rss-ai-worker:${TAG:-latest}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid
+    pids_limit: 128
+    cpus: "1.25"
+    mem_limit: 768m
+    stop_grace_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    logging: *default-logging
+    depends_on:
+      miniflux:
+        condition: service_healthy
+    ports:
+      - "${BIND_IP:-0.0.0.0}:${PORT_AI_CONSOLE:-18090}:80"
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      PYTHONDONTWRITEBYTECODE: "1"
+      RSS_AI_PG_MIRROR_ENABLED: "1"
+      RSS_AI_WRITE_MODE: postgres
+      RSS_AI_ADMIN_USER: ${MINIFLUX_ADMIN_USER:-admin}
+      RSS_AI_ADMIN_PASSWORD: ${MINIFLUX_ADMIN_PASSWORD:-admin_secret}
+      RSS_AI_STORAGE_MODE: postgres
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: ${POSTGRES_DB:-miniflux}
+      PGUSER: ${POSTGRES_USER:-miniflux}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-miniflux_secret}
+      HOST_IP: ${HOST_IP:-127.0.0.1}
+      PORT_AI_CONSOLE: ${PORT_AI_CONSOLE:-18090}
+    volumes:
+      - ./data/ai-worker:/app/data
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:80/healthz', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks: [rss]
+
+  reactflux:
+    image: electh/reactflux:latest
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      miniflux:
+        condition: service_healthy
+    ports:
+      - "${BIND_IP:-0.0.0.0}:${PORT_REACTFLUX:-13000}:2000"
+    networks: [rss]
+
+networks:
+  rss:
+    name: rss

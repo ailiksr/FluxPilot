@@ -1,0 +1,12 @@
+# Override file for local development / building from source
+# Usage: docker compose -f compose.yml -f compose.build.yml up -d --build
+services:
+  image-proxy:
+    build:
+      context: ./image-proxy
+      dockerfile: Dockerfile
+
+  miniflux-ai:
+    build:
+      context: ./miniflux-ai
+      dockerfile: Dockerfile

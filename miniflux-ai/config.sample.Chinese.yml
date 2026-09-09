@@ -1,0 +1,124 @@
+# INFO、DEBUG、WARN、ERROR
+log_level: "INFO"
+
+# 跳过此Unix时间戳之前的条目，避免版本迁移时重复处理 (可选)
+# entry_since: 1704067200  # Unix时间戳，2024-01-01 00:00:00 UTC，获取当前时间戳: date +%s
+
+miniflux:
+  base_url: https://your.server.com
+  api_key: Miniflux_API_key_here
+  # webhook_secret: Miniflux_webhook_secret_here
+
+llm:
+  base_url: http://host.docker.internal:11434/v1  # LLM API 接口地址
+  api_key: ollama                                 # API 密钥
+  model: llama3.1:latest                          # 模型名称
+  # timeout: 60        # 请求超时时间，单位秒 (默认: 60)
+  # max_workers: 4     # 并发请求数限制 (默认: 4)
+  # RPM: 15            # 每分钟请求数限制 (默认: 1000)
+  # prompt_processing: strict  # none | strict（默认）| single
+  #   none:   原样透传多条消息，适用于 OpenAI 等多 system 消息的模型
+  #   strict: 合并同角色消息，非首条 system 降级为 <instruction>，适用于 DeepSeek 等
+  #   single: 全部合并为单条 user 消息，适用于不支持 system 角色的模型
+
+digest:
+  # RSS 订阅源生成的服务地址 (Docker Compose 环境使用容器名)
+  url: http://miniflux-ai
+
+  # 在 Miniflux 中显示的订阅源名称 (可选，有默认值)
+  # name: "Minifluxᴬᴵ Digest for you"
+
+  # 条目引用链接模板 (用 {id} 作为条目ID占位符)
+  # 用于在摘要中生成可点击的条目链接，支持 Miniflux/ReactFlux 等不同前端
+  # Miniflux 默认: https://your.server.com/search/entry/{id}
+  # ReactFlux: https://your.server.com/all/entry/{id}
+  entry_url: "https://your.server.com/search/entry/{id}"
+  
+  # 每日摘要生成时间安排 (24小时制)
+  schedule:
+    - "07:30"  # 早晨
+    - "18:00"  # 傍晚
+    - "22:00"  # 夜晚
+  prompts:
+    greeting: |-
+      请根据当前日期和24小时制的时间生成一句友好而热情的问候语。请用关怀的语气，包含适量的鼓励，且添加简单的表情符号，如😊、🌞、🌸等，以增加温暖感。例：‘早上好！希望你今天充满活力，迎接美好的一天！🌞😊’。无论是早上、中午或晚上，都请根据时间调整问候内容，保持真诚关怀的氛围。
+    summary: |-
+      按主题生成一份结构化的摘要。
+
+      核心任务：
+      1. 主题聚类：将内容聚合并命名为 3–6 个核心主题（如”科技前沿””经济动态”）。
+      2. 要点提炼：每个主题下提取不超过 6 条关键要点。
+         - 同一主题下按质量排序：新闻/官方优先，其次分析，最后社区。
+         - 每条控制在 50 字以内。
+         - 内容忠实于原文，不引入外部信息或评论。
+
+      结构：
+      - 主题标题以 `####` 开头，要点以 `-` 列出。
+      - 无全局标题或说明文字。
+
+      示例：
+      #### 科技前沿
+      - AI模型在医疗诊断中取得突破。[^101]
+      - 量子计算或重塑加密技术格局。[^102][^103]
+
+      #### 经济动态
+      - 全球通胀压力上升，央行或加息。[^104]
+
+agents:
+  summary:
+    prompt: |-
+      提炼一段核心摘要，中文，少于60字。
+      客观中立，不添加个人观点。仅总结，不回答原文中的问题。
+    template: |-
+      <aside>
+      {content}
+      </aside>
+      <hr>
+    
+    # 规则过滤配置
+    # 规则格式: FieldName=RegexPattern (特殊字段可使用 FieldName=Operator:Value)
+    # 支持的字段:
+    #   - EntryTitle: 条目标题
+    #   - EntryURL: 条目URL
+    #   - EntryContent: 条目内容 (HTML已清理)
+    #   - EntryAuthor: 条目作者
+    #   - EntryTag: 条目标签 (逗号分隔)
+    #   - EntryContentLength: 内容长度比较 (运算符: gt, ge, lt, le, eq, between)
+    #   - FeedSiteURL: 订阅源站点URL
+    #   - FeedTitle: 订阅源标题
+    #   - FeedCategoryTitle: 订阅源分类标题
+    #   - NeverMatch: 永不匹配的占位符 (等号后可填任意说明文字)
+    #
+    # 使用 (?i) 前缀进行不区分大小写的匹配
+    
+    allow_rules: []
+    deny_rules:
+      - FeedSiteURL=http://miniflux-ai        # 排除摘要订阅源
+      - EntryContentLength=lt:100             # 屏蔽少于100 tokens的条目
+      # - EntryContentLength=gt:500           # 仅保留超过500 tokens的条目
+      # - EntryContentLength=ge:100           # 仅保留大于等于100 tokens的条目
+      # - EntryContentLength=between:100,500  # 仅保留100-500 tokens的条目
+      # - EntryTitle=广告|推广                 # 排除包含"广告"或"推广"的标题
+      # - FeedSiteURL=https://spam\.com       # 排除特定站点
+      # - FeedCategoryTitle=(?i)spam          # 排除特定分类
+    
+  translate:
+    prompt: |-
+      You are a highly skilled translation engine with expertise in the news media sector. 
+      Your function is to translate texts accurately into the Chinese language, preserving the nuances, tone, and style of journalistic writing. 
+      Do not add any explanations or annotations to the translated text.
+    template: |-
+      <h3>🌐翻译：</h3>
+      {content}
+      <hr>
+    
+    # 翻译规则配置
+    # 警告: 如果 allow_rules 和 deny_rules 都为空，将处理所有条目
+    # 这可能消耗大量 token。建议使用 allow_rules 限制处理范围。
+    
+    allow_rules:     # 仅翻译匹配的条目
+      - NeverMatch=  # 永不匹配的占位符
+      # - FeedSiteURL=https://example\.com.*   # 翻译特定站点的所有内容
+      # - FeedTitle=(?i).*tech.*news.*         # 翻译标题包含"tech"和"news"的源
+      # - EntryURL=.*foreign\.example\.com.*   # 翻译特定域名的内容
+    deny_rules: []   # 排除翻译的规则

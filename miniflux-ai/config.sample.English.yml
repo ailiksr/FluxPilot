@@ -1,0 +1,125 @@
+# Log level: INFO, DEBUG, WARN, ERROR
+log_level: "INFO"
+
+# Skip entries before this unix timestamp to avoid reprocessing during migration (optional)
+# entry_since: 1704067200  # Unix timestamp for 2024-01-01 00:00:00 UTC
+
+miniflux:
+  base_url: https://your.server.com
+  api_key: Miniflux_API_key_here
+  # webhook_secret: Miniflux_webhook_secret_here
+
+llm:
+  base_url: http://host.docker.internal:11434/v1  # LLM API endpoint
+  api_key: ollama                                 # API key
+  model: llama3.1:latest                          # Model name
+  # timeout: 60        # Request timeout in seconds (default: 60)
+  # max_workers: 4     # Concurrent request limit (default: 4)
+  # RPM: 15            # Requests per minute limit (default: 1000)
+  # prompt_processing: strict  # none | strict (default) | single
+  #   none:   Pass-through multiple messages as-is, for OpenAI and models supporting multiple system messages
+  #   strict: Merge same-role messages, demote non-first system to <instruction>, for DeepSeek etc.
+  #   single: Collapse all into a single user message, for models without system role support
+
+digest:
+  # Service URL for RSS feed generation (use container name for Docker Compose)
+  url: http://miniflux-ai
+
+  # Feed name displayed in Miniflux (optional, has default value)
+  # name: "Minifluxᴬᴵ Digest for you"
+
+  # Entry reference link template (use {id} as entry ID placeholder)
+  # Used to generate clickable entry links in digest, supports different frontends
+  # Miniflux default: https://your.server.com/search/entry/{id}
+  # ReactFlux: https://your.server.com/all/entry/{id}
+  entry_url: "https://your.server.com/search/entry/{id}"
+  
+  # Daily digest generation schedule (24-hour format)
+  schedule:
+    - "07:30"  # Morning
+    - "18:00"  # Evening
+    - "22:00"  # Night
+  prompts:
+    greeting: |-
+      According to the current date and 24-hour time, generate a friendly and warm greeting. Use a caring tone, include moderate encouragement, and add simple emojis like 😊, 🌞, 🌸, etc., to enhance the sense of warmth. Example: 'Good morning! May you be full of energy today and welcome a wonderful day! 🌞😊'. Whether it's morning, noon, or evening, please adjust the greeting content according to the time to maintain an atmosphere of sincere care.
+    summary: |-
+      Generate a structured digest organized by theme.
+
+      Core Tasks:
+      1. Topic Clustering: Group content into 3–6 core themes (e.g., “Tech Frontiers”, “Economic Trends”).
+      2. Key Point Extraction: Extract up to 6 concise key points per theme.
+         - Each point no longer than 30 words.
+         - Order by quality: news/official sources first, expert analysis, then community posts.
+         - Content must be faithful to the original summaries.
+
+      Structure:
+      - Use `####` for theme titles, `-` for key points.
+      - No global title or introduction.
+
+      Example:
+      #### Tech Frontiers
+      - AI models achieve breakthroughs in medical diagnostics. [^101]
+      - Quantum computing reshapes encryption technologies. [^102][^103]
+
+      #### Economic Trends
+      - Global inflation pressure rises; central banks consider rate hikes. [^104]
+
+agents:
+  summary:
+    prompt: |-
+      Extract a core summary in English, less than 60 characters.
+      Be objective and neutral. Only summarize, do not answer questions or add personal opinions.
+    template: |-
+      <aside>
+      {content}
+      </aside>
+      <hr>
+    
+    # Rule-based filtering
+    # Rule format: FieldName=RegexPattern (or FieldName=Operator:Value for special fields)
+    # Supported fields:
+    #   - EntryTitle: Entry title
+    #   - EntryURL: Entry URL
+    #   - EntryContent: Entry content (HTML stripped)
+    #   - EntryAuthor: Entry author
+    #   - EntryTag: Entry tags (comma-separated)
+    #   - EntryContentLength: Content length comparison (operators: gt, ge, lt, le, eq, between)
+    #   - FeedSiteURL: Feed site URL
+    #   - FeedTitle: Feed title
+    #   - FeedCategoryTitle: Feed category title
+    #   - NeverMatch: Special placeholder that never matches (value after = can be any comment)
+    #
+    # Use (?i) prefix for case-insensitive matching
+    
+    allow_rules: []
+    deny_rules:
+      - FeedSiteURL=http://miniflux-ai          # Exclude digest feed
+      - EntryContentLength=lt:100               # Block entries with < 100 tokens
+      # - EntryContentLength=gt:500             # Only allow entries with > 500 tokens
+      # - EntryContentLength=ge:100             # Only allow entries with >= 100 tokens
+      # - EntryContentLength=between:100,500    # Only allow entries with 100-500 tokens
+      # - EntryTitle=(?i)\b(save|get)\s+\$\d{2,5}\b  # Block "Save $50", "Get $100" in title
+      # - EntryTitle=(?i)\$\d{2,5}\s+(off|discount)  # Block "$50 off" patterns
+      # - FeedSiteURL=https://spam\.com         # Block specific site
+      # - FeedCategoryTitle=(?i)ads             # Block specific category
+    
+  translate:
+    prompt: |-
+      You are a highly skilled translation engine with expertise in the news media sector. 
+      Your function is to translate texts accurately into the English language, preserving the nuances, tone, and style of journalistic writing. 
+      Do not add any explanations or annotations to the translated text.
+    template: |-
+      <h3>🌐Translation:</h3>
+      {content}
+      <hr>
+    
+    # Translation rule configuration
+    # WARNING: If both allow_rules and deny_rules are empty, ALL entries will be processed
+    # This may consume significant tokens. Use allow_rules to limit processing scope.
+    
+    allow_rules:     # Only translate matching entries
+      - NeverMatch=  # Never-matching placeholder
+      # - FeedSiteURL=https://example\.com.*          # Translate specific site
+      # - FeedTitle=(?i).*foreign.*news.*             # Translate feeds with "foreign" and "news"
+      # - EntryURL=.*international\.example\.com.*    # Translate specific domain
+    deny_rules: []   # Exclude from translation

@@ -1,0 +1,5 @@
+[
+ {"id":"p1","title":"精品文章","score":88,"feed_weight":1.0,"expected_rank":1},
+ {"id":"p2","title":"普通文章","score":50,"feed_weight":1.0,"expected_rank":3},
+ {"id":"p3","title":"高质量来源普通文章","score":70,"feed_weight":1.15,"expected_rank":2}
+]

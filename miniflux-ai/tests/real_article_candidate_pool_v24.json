@@ -1,0 +1,311 @@
+{
+  "created": "2026-08-27",
+  "purpose": "真实文章人工标注候选池，不代表最终标签",
+  "items": [
+    {
+      "entry_id": 3,
+      "title": "姑娘：今天就算把我开除，我也得笑出来",
+      "current_score": 30,
+      "judge": {
+        "information": 1,
+        "evidence": 0,
+        "depth": 1,
+        "timeliness": 0,
+        "originality": 1,
+        "practicality": 0,
+        "promotional": 0,
+        "entertainment_only": 4,
+        "low_content": 3
+      },
+      "judge_hash": "338f8ea61d60a03faac4c1349686e9f602f2fb437c154f4f631bf3c6ff646752",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 6,
+      "title": "丹麦干了一件全球第一个吃螃蟹的事",
+      "current_score": 22,
+      "judge": {
+        "information": 1,
+        "evidence": 0,
+        "depth": 0,
+        "timeliness": 1,
+        "originality": 0,
+        "practicality": 0,
+        "promotional": 3,
+        "entertainment_only": 2,
+        "low_content": 5
+      },
+      "judge_hash": "7478fe1844b2bdb0a6ffa0c55a03a7be9f9f9e091209edf078fc39069b2d3234",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 7,
+      "title": "你亲戚提过什么奇怪的要求？",
+      "current_score": 10,
+      "judge": {
+        "information": 0,
+        "evidence": 0,
+        "depth": 0,
+        "timeliness": 0,
+        "originality": 0,
+        "practicality": 0,
+        "promotional": 0,
+        "entertainment_only": 5,
+        "low_content": 5
+      },
+      "judge_hash": "de59eff5335dc0d5a6a6b93ed75a185b9caba5e2b4d64ba8fc00a94a53050643",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 4,
+      "title": "微语录精选0826：70后好好赚钱，还要养三代人",
+      "current_score": 56,
+      "judge": {
+        "information": 3,
+        "evidence": 3,
+        "depth": 1,
+        "timeliness": 3,
+        "originality": 2,
+        "practicality": 1,
+        "promotional": 0,
+        "entertainment_only": 2,
+        "low_content": 3
+      },
+      "judge_hash": "58662954263904b17db9eec42744cfbf05ff342b031e611f2bae02d02211dad4",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 5,
+      "title": "二向箔落下后，太阳系只剩一幅画｜《三体》AI短片",
+      "current_score": 30,
+      "judge": {
+        "information": 1,
+        "evidence": 0,
+        "depth": 0,
+        "timeliness": 2,
+        "originality": 1,
+        "practicality": 0,
+        "promotional": 0,
+        "entertainment_only": 3,
+        "low_content": 4
+      },
+      "judge_hash": "17fc5e27d16666be156e64eb2ef1313c74a65d804fcc88ef9e447fa32769e60d",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 8,
+      "title": "Montagut 梦特娇 记忆棉枕芯护颈深睡枕头  34元包邮",
+      "current_score": 31,
+      "judge": {
+        "information": 0,
+        "evidence": 1,
+        "depth": 0,
+        "timeliness": 3,
+        "originality": 0,
+        "practicality": 2,
+        "promotional": 5,
+        "entertainment_only": 0,
+        "low_content": 4
+      },
+      "judge_hash": "0e7bab51a75681677d53e8911996910c6235288d4a6a2d696df51354d1069c07",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 9,
+      "title": "一次看完10部鲨鱼版《牛来》！没看过六头鲨奔跑的人生是不完整的！",
+      "current_score": 14,
+      "judge": {
+        "information": 0,
+        "evidence": 0,
+        "depth": 0,
+        "timeliness": 1,
+        "originality": 0,
+        "practicality": 0,
+        "promotional": 2,
+        "entertainment_only": 5,
+        "low_content": 5
+      },
+      "judge_hash": "f9033a010c177c91075b5eab1f3c3ba5df45dd07cdb4181f43ffd487f3bebfbe",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 11,
+      "title": "江中初元 PROSHIELD牌 蛋白粉400g*2罐 礼盒装 89元包邮",
+      "current_score": 35,
+      "judge": {
+        "information": 1,
+        "evidence": 1,
+        "depth": 0,
+        "timeliness": 3,
+        "originality": 0,
+        "practicality": 2,
+        "promotional": 5,
+        "entertainment_only": 0,
+        "low_content": 4
+      },
+      "judge_hash": "e5db17f62504e624e1599c4d7a70df646e2d02653d1f8f5e6112150d1b4bc162",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 13,
+      "title": "[博海拾贝0826]一看穿长裤基本就没戏了",
+      "current_score": 18,
+      "judge": {
+        "information": 0,
+        "evidence": 0,
+        "depth": 0,
+        "timeliness": 1,
+        "originality": 1,
+        "practicality": 0,
+        "promotional": 0,
+        "entertainment_only": 5,
+        "low_content": 5
+      },
+      "judge_hash": "ab02bd0e2db68accf0c0eba8fd93a866ac1b2abd5d5a4a4e1fb67c152a325ac3",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 2,
+      "title": "百货 50 条，全部是实用的玩意儿（0826第 3690期）",
+      "current_score": 37,
+      "judge": {
+        "new_information": 0,
+        "factual_evidence": 1,
+        "depth": 0,
+        "timeliness": 3,
+        "originality": 0,
+        "promotional": 2,
+        "entertainment_only": 0,
+        "low_content": 0,
+        "informative_entertainment": 0,
+        "information": 0,
+        "evidence": 3,
+        "practicality": 0
+      },
+      "judge_hash": "a22d470925637d0b60e3356f296eed80cfeb68f1868bc2f9b917bb6f25341f3d",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 10,
+      "title": "外卖已经是牛夫人了？现在走来的是 ai 小甜甜",
+      "current_score": 65,
+      "judge": {
+        "new_information": 1,
+        "factual_evidence": 1,
+        "depth": 3,
+        "timeliness": 3,
+        "originality": 3,
+        "promotional": 2,
+        "entertainment_only": 0,
+        "low_content": 0,
+        "informative_entertainment": 1,
+        "information": 3,
+        "evidence": 3,
+        "practicality": 2
+      },
+      "judge_hash": "ec002dbe6ae87d6213d6b50668ddc51552b72071c24659cd7fdb031738f76dd4",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 14,
+      "title": "上万只鸡爪如何脱骨？带你逛中国无骨鸡爪生产工厂",
+      "current_score": 24,
+      "judge": {
+        "information": 1,
+        "evidence": 0,
+        "depth": 0,
+        "timeliness": 0,
+        "originality": 1,
+        "practicality": 0,
+        "promotional": 0,
+        "entertainment_only": 4,
+        "low_content": 5
+      },
+      "judge_hash": "de2a8855388a17521c5f5799ac50686e6d5b8d836ec4c6d2a4492eb8016fae91",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    },
+    {
+      "entry_id": 15,
+      "title": "Night Digest for you - 2026-08-26",
+      "current_score": 37,
+      "judge": {
+        "information": 3,
+        "evidence": 2,
+        "depth": 1,
+        "timeliness": 3,
+        "originality": 1,
+        "practicality": 3,
+        "promotional": 4,
+        "entertainment_only": 2,
+        "low_content": 2
+      },
+      "judge_hash": "2ab783ef9864dadad2b104edffbb5f424a9c3c8315729a9cba2426cfc34a7b80",
+      "human_review": {
+        "status": "pending",
+        "final_category": null,
+        "final_range": null,
+        "notes": null
+      }
+    }
+  ]
+}

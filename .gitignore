@@ -1,0 +1,41 @@
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+miniflux-api-key
+
+# Application runtime data & storage
+data/
+cache/
+logs/
+*.log
+*.dat
+*.jsonl
+
+# Temporary and backup files
+*.tmp
+*.bak
+*.bak*
+*.swp
+*~
+
+# Python cache & build
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Docker build cache
+.docker/
+
+# IDE & OS files
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db

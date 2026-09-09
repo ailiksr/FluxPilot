@@ -1,0 +1,158 @@
+{
+  "created": "2026-08-27",
+  "note": "真实文章候选基准，范围待人工确认",
+  "items": [
+    {
+      "id": "3168d891eb16067d",
+      "entry_id": 3,
+      "title": "姑娘：今天就算把我开除，我也得笑出来",
+      "category": "low",
+      "score_range": [
+        10,
+        35
+      ],
+      "current_score": 10,
+      "judge": {
+        "information": 0,
+        "evidence": 0,
+        "depth": 0,
+        "timeliness": 0,
+        "originality": 0,
+        "practicality": 0,
+        "promotional": 2,
+        "entertainment_only": 3,
+        "low_content": 5
+      },
+      "judge_hash": "2c487b680c5d407ee94bd445d6d59bcb8eac7ae887e6970be1221ae677ce133c",
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "final_range": null,
+        "notes": null
+      },
+      "content_hash_required": true
+    },
+    {
+      "id": "72a93edcec92b29d",
+      "entry_id": 6,
+      "title": "丹麦干了一件全球第一个吃螃蟹的事",
+      "category": "ordinary",
+      "score_range": [
+        35,
+        65
+      ],
+      "current_score": 46,
+      "judge": {
+        "information": 3,
+        "evidence": 2,
+        "depth": 2,
+        "timeliness": 3,
+        "originality": 2,
+        "practicality": 2,
+        "promotional": 1,
+        "entertainment_only": 1,
+        "low_content": 2
+      },
+      "judge_hash": "1b0d23f0cbb1172f6e814d7111b29873d19f6da74c8288ed22ce637ba3585e23",
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "final_range": null,
+        "notes": null
+      },
+      "content_hash_required": true
+    },
+    {
+      "id": "fe92f361882e128d",
+      "entry_id": 4,
+      "title": "微语录精选0826：70后好好赚钱，还要养三代人",
+      "category": "low",
+      "score_range": [
+        10,
+        35
+      ],
+      "current_score": 34,
+      "judge": {
+        "information": 2,
+        "evidence": 2,
+        "depth": 1,
+        "timeliness": 3,
+        "originality": 1,
+        "practicality": 1,
+        "promotional": 0,
+        "entertainment_only": 3,
+        "low_content": 4
+      },
+      "judge_hash": "f5068bd5c3ec37961ec994a95e1cf83a69687c345dc0173bed0a778fcf356d4e",
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "final_range": null,
+        "notes": null
+      },
+      "content_hash_required": true
+    },
+    {
+      "id": "7cd3ed8f95869e81",
+      "entry_id": 10,
+      "title": "外卖已经是牛夫人了？现在走来的是 ai 小甜甜",
+      "category": "useful",
+      "score_range": [
+        60,
+        80
+      ],
+      "current_score": 54,
+      "judge": {
+        "information": 3,
+        "evidence": 3,
+        "depth": 3,
+        "timeliness": 3,
+        "originality": 3,
+        "practicality": 2,
+        "promotional": 2,
+        "entertainment_only": 0,
+        "low_content": 0
+      },
+      "judge_hash": "7963a6e1290b4624d4ebe7bbd4588f773b33f660fec56ad407cd1972305c1119",
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "final_range": null,
+        "notes": null
+      },
+      "content_hash_required": true
+    },
+    {
+      "id": "ecae4d5d78776a48",
+      "entry_id": 15,
+      "title": "Night Digest for you - 2026-08-26",
+      "category": "ordinary",
+      "score_range": [
+        35,
+        65
+      ],
+      "current_score": 39,
+      "judge": {
+        "information": 3,
+        "evidence": 2,
+        "depth": 1,
+        "timeliness": 3,
+        "originality": 1,
+        "practicality": 2,
+        "promotional": 3,
+        "entertainment_only": 2,
+        "low_content": 3
+      },
+      "judge_hash": "d93881a3542350c863e5cc6351c10d0bc62889b9e290702fc59f66ab544d728d",
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "final_range": null,
+        "notes": null
+      },
+      "content_hash_required": true
+    }
+  ],
+  "schema_version": "v24.1",
+  "purpose": "真实 RSS 文章人工校准候选集；human_review 完成前禁止作为生产评分回归硬门槛"
+}

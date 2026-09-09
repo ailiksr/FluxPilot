@@ -1,0 +1,8 @@
+[
+ {"id":"very_low","label":"极低价值","judge":{"information":0,"evidence":0,"depth":0,"timeliness":0,"originality":0,"practicality":0,"promotional":0,"entertainment_only":0,"low_content":5},"range":[10,20]},
+ {"id":"low","label":"低价值","judge":{"information":1,"evidence":1,"depth":1,"timeliness":1,"originality":1,"practicality":1,"promotional":1,"entertainment_only":1,"low_content":2},"range":[20,35]},
+ {"id":"ordinary","label":"普通","judge":{"information":2.5,"evidence":2.5,"depth":2.5,"timeliness":2.5,"originality":2.5,"practicality":2.5,"promotional":0,"entertainment_only":0,"low_content":0},"range":[45,55]},
+ {"id":"useful","label":"有价值","judge":{"information":3.5,"evidence":3,"depth":3,"timeliness":3,"originality":3,"practicality":4,"promotional":0,"entertainment_only":0,"low_content":0},"range":[60,75]},
+ {"id":"high","label":"高价值","judge":{"information":4,"evidence":4,"depth":4,"timeliness":3.5,"originality":4,"practicality":4,"promotional":0,"entertainment_only":0,"low_content":0},"range":[70,85]},
+ {"id":"excellent","label":"精品","judge":{"information":5,"evidence":5,"depth":5,"timeliness":4,"originality":5,"practicality":5,"promotional":0,"entertainment_only":0,"low_content":0},"range":[85,95]}
+]

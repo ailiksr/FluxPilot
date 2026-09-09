@@ -1,0 +1,9 @@
+FROM python:3.11-slim-bookworm
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt pytest==8.3.5
+COPY . .
+RUN addgroup --system --gid 981 rssai \
+    && adduser --system --no-create-home --uid 999 --ingroup rssai rssai \
+    && chown -R 999:981 /app
+USER 999:981

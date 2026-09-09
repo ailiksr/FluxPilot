@@ -1,0 +1,9 @@
+{
+  "schema_version": "v24.2",
+  "description": "人工审核真实RSS文章模板，不自动生成标准答案",
+  "fields": {
+    "final_category": ["very_low", "low", "ordinary", "useful", "high", "excellent"],
+    "final_range": "[min,max]",
+    "reason": "人工判断依据"
+  }
+}

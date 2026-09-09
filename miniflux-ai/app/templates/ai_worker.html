@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RSS AI · 运营控制台</title>
+<link rel="stylesheet" href="/static/css/console.css?v=163">
+</head>
+<body class="console-page">
+<div class="console-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">AI</span><div><strong>RSS AI</strong><small>Operations Console</small></div></div>
+    <nav>
+      <a class="nav-tab active" data-tab="triage" href="#triage" onclick="switchTab('triage');return false;">
+        <span>🗑️ 待办与清理</span>
+        <span class="nav-right"><span id="navTriageBadge" class="tab-badge">0</span><kbd>1</kbd></span>
+      </a>
+      <a class="nav-tab" data-tab="rules" href="#rules" onclick="switchTab('rules');return false;">
+        <span>🎯 偏好与规则</span>
+        <span class="nav-right"><kbd>2</kbd></span>
+      </a>
+      <a class="nav-tab" data-tab="feeds" href="#feeds" onclick="switchTab('feeds');return false;">
+        <span>📡 订阅源治理</span>
+        <span class="nav-right"><kbd>3</kbd></span>
+      </a>
+      <a class="nav-tab" data-tab="explore" href="#explore" onclick="switchTab('explore');return false;">
+        <span>🧭 探索与系统</span>
+        <span class="nav-right"><kbd>4</kbd></span>
+      </a>
+    </nav>
+    <div class="sidebar-note"><b>阅读入口</b><span>日常阅读请使用 Miniflux、Reactflux 或订阅 <a href="/rss/curated?min_score=70" target="_blank" style="color:#60a5fa">/rss/curated</a> 精选源。本面板只管理规则与分流。</span></div>
+  </aside>
+  <main class="console-main">
+    <header class="console-topbar">
+      <div>
+        <div class="eyebrow">RSS AI OPERATIONS</div>
+        <h1 id="topbarTitle">待办与清理</h1>
+        <p id="topbarDesc">AI 自动执行微观研判与分类，你只需要一键清空废纸篓或对极少数边界文章快速定夺。</p>
+      </div>
+      <div class="topbar-actions">
+        <span class="kbd-hint">按数字键 1-4 快速切页 · r 刷新</span>
+        <button class="ghost refresh-btn" id="refreshBtn" onclick="refreshConsole()">↻ 刷新数据</button>
+      </div>
+    </header>
+
+    <!-- Top Status Bar (Persistent Across Views) -->
+    <section id="overview" class="status-band">
+      <div class="status-title"><span class="status-dot"></span><div><b id="systemStatusTitle">系统运行正常</b><small id="lastRefresh">检查中…</small></div></div>
+      <div class="status-items">
+        <span>LLM <b id="llmState">—</b></span>
+        <span>存储 <b id="storageState">—</b></span>
+        <span>写入 <b id="writeState">—</b></span>
+        <span>Outbox <b id="outboxState">—</b></span>
+        <span>Feed <b id="feedState">—</b></span>
+        <span>巡检 <b id="patrolState">自洽正常</b></span>
+        <span>摘要 <b id="summaryState">—</b></span>
+      </div>
+    </section>
+
+    <!-- TAB 1: 待办与清理 (Triage & Clean) -->
+    <div id="tab-triage" class="tab-view active">
+      <section class="metric-grid" id="consoleMetrics">
+        <article><small>已评分文章</small><strong id="metricScored">—</strong><span>全量分析</span></article>
+        <article><small>AI 自动分流</small><strong id="metricAuto">—</strong><span>无需人看</span></article>
+        <article><small>⚡ 前置规则熔断</small><strong id="metricFastPath" style="color:#175cd3">—</strong><span>节约 LLM 算力</span></article>
+        <article class="attention"><small>待清理废纸篓</small><strong id="metricArchive">—</strong><span>垃圾/广告</span></article>
+        <article><small>边界需定夺</small><strong id="metricBoundary">—</strong><span>少数冲突项</span></article>
+        <article><small>重复检测</small><strong id="metricDuplicates">—</strong><span>已自动识别</span></article>
+      </section>
+
+      <!-- 1. Boundary Quick Decisions (Top Priority for Human Eye) -->
+      <section class="console-section">
+        <div class="section-head">
+          <div><div class="eyebrow">PRIORITY DECISIONS</div><h2>⚖️ 待裁决边界文章 (仅需人工快速定夺)</h2><p>AI 信号存在轻微冲突的文章（通常仅 5-10 篇），点击即可一键定夺，无需复杂打分。</p></div>
+          <div class="head-actions">
+            <button type="button" class="ghost btn-batch-keep" onclick="batchDecideBoundary('keep', this)">🟢 全部保留 (<span id="batchKeepCount">0</span>)</button>
+            <button type="button" class="ghost btn-batch-discard" onclick="batchDecideBoundary('archive', this)">🔴 全部丢弃 (<span id="batchDiscardCount">0</span>)</button>
+            <span id="boundaryBadge" class="mode-pill">—</span>
+          </div>
+        </div>
+        <div id="boundaryList" class="boundary-list"><div class="loading-row">加载中…</div></div>
+      </section>
+
+      <!-- 2. Trash / Auto-Muted Junk Queue (Secondary Clean Container) -->
+      <section class="console-section archive-section">
+        <div class="section-head">
+          <div><div class="eyebrow">TRASH & JUNK</div><h2>🗑️ 待清理废纸篓 (系统已自动静音)</h2><p>命中静音规则、屏蔽类型或低质高营销的文章。AI 已完成预审，直接一键清空即可。</p></div>
+        </div>
+        <div class="trash-controls-bar">
+          <div class="filter-chips" id="trashFilterChips">
+            <button type="button" class="chip-btn active" onclick="filterTrash('all', this)">全部 (<span id="trashFilterAll">0</span>)</button>
+            <button type="button" class="chip-btn" onclick="filterTrash('rule', this)">🚫 屏蔽词 (<span id="trashFilterRule">0</span>)</button>
+            <button type="button" class="chip-btn" onclick="filterTrash('deal', this)">🏷️ 促销 (<span id="trashFilterDeal">0</span>)</button>
+            <button type="button" class="chip-btn" onclick="filterTrash('low', this)">📉 低质 (<span id="trashFilterLow">0</span>)</button>
+          </div>
+          <div class="head-actions">
+            <button type="button" class="clear-all-archive" onclick="clearAllArchiveCandidates()">🗑️ 一键清空废纸篓 (<span id="trashCount">0</span> 篇)</button>
+            <button type="button" class="ghost" onclick="toggleArchiveQueueDrawer()">🗄 待归档清单</button>
+          </div>
+        </div>
+        <div class="archive-workbench">
+          <div class="archive-queue-col">
+            <div class="archive-queue-head"><b>废纸篓候选清单</b><small id="archiveQueueCount">0</small></div>
+            <div id="archiveReviewList" class="archive-review-list"><div class="loading-row">加载中…</div></div>
+            <div id="archiveQueueDrawer" class="archive-queue-drawer" hidden>
+              <div class="archive-drawer-head"><b>已标记归档（待执行）</b><span>执行后调用 Miniflux，仍可在下方撤销</span><button type="button" class="execute-archive" onclick="executeArchiveQueue()">执行归档</button></div>
+              <div id="archiveQueue" class="action-list"><div class="action-empty">加载中…</div></div>
+            </div>
+          </div>
+          <div class="archive-detail-col" id="archiveDetail"><div class="empty-console"><b>选择一篇文章查看详情</b><span>查看 AI 判断依据与命中规则</span></div></div>
+        </div>
+      </section>
+
+      <!-- Recent Purges & Undo -->
+      <section class="console-section">
+        <div class="section-head">
+          <div><div class="eyebrow">RECENT PURGES</div><h2>↶ 最近实际归档记录与撤销</h2><p>每次一键清空或归档都会留存原始状态，发生误判可在此处随时一键撤销还原。</p></div>
+          <div class="head-actions">
+            <button type="button" class="ghost" onclick="batchRollbackAll(this)">↶ 一键全部撤回</button>
+          </div>
+        </div>
+        <div id="recentActions" class="action-list"><div class="action-empty">暂无可撤销的归档操作</div></div>
+      </section>
+    </div>
+
+    <!-- TAB 2: 偏好与规则 (Rules & Mute) -->
+    <div id="tab-rules" class="tab-view">
+      <section class="console-section">
+        <div class="section-head">
+          <div><div class="eyebrow">USER RULES & PREFERENCES</div><h2>偏好与过滤规则 (Feedly Leo / newscope 模式)</h2><p>配置你的专属关注词与静音词。AI 评分与自主分流引擎将严格按此执行，一次配置，终身免打工。</p></div>
+          <div class="head-actions">
+            <button type="button" class="ghost" onclick="openRulesExportModal()">📤 导出备份</button>
+            <button type="button" class="ghost" onclick="openRulesImportModal()">📥 导入规则</button>
+            <button type="button" class="ghost" onclick="pruneZeroHitRules(this)" title="剔除从未命中过的冷门词">🧹 清理0命中标签</button>
+            <button class="ghost save-rules-btn" onclick="saveUserRules(this)">💾 保存并生效规则</button>
+          </div>
+        </div>
+        <div class="rules-grid">
+          <div class="rules-card">
+            <div class="rules-head">
+              <b>🟢 关注主题与关键词 (Boost 提权)</b>
+              <small>AI 加 15 分，自动推送到优先阅读与精选源</small>
+            </div>
+            <input class="tag-search-input" placeholder="🔍 快速过滤标签..." oninput="filterCardTags(this, 'boostTags')">
+            <div id="boostTags" class="tag-cloud"></div>
+            <div id="boostSuggestions" class="rule-suggestions" hidden></div>
+            <div class="tag-input-row">
+              <input id="boostInput" placeholder="输入关注词，回车" oninput="simulateInput('boost',this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();addRuleTag('boost',this.value);this.value='';}">
+              <button class="ghost" onclick="addRuleTag('boost',$('boostInput').value);$('boostInput').value='';">添加</button>
+            </div>
+            <div id="boostSimBox" class="sim-box" hidden></div>
+          </div>
+          <div class="rules-card">
+            <div class="rules-head">
+              <b>🔴 静音与屏蔽关键词 (Mute 直接归档)</b>
+              <small>命中直接扣分并划入废纸篓</small>
+            </div>
+            <input class="tag-search-input" placeholder="🔍 快速过滤标签..." oninput="filterCardTags(this, 'muteKwTags')">
+            <div id="muteKwTags" class="tag-cloud"></div>
+            <div id="muteSuggestions" class="rule-suggestions" hidden></div>
+            <div class="tag-input-row">
+              <input id="muteKwInput" placeholder="输入屏蔽词，回车" oninput="simulateInput('mute_kw',this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();addRuleTag('mute_kw',this.value);this.value='';}">
+              <button class="ghost" onclick="addRuleTag('mute_kw',$('muteKwInput').value);$('muteKwInput').value='';">添加</button>
+            </div>
+            <div id="muteSimBox" class="sim-box" hidden></div>
+          </div>
+          <div class="rules-card">
+            <div class="rules-head">
+              <b>🚫 屏蔽主题与适度降权</b>
+              <small>按大类屏蔽或微调降权 (-15分)</small>
+            </div>
+            <div id="muteTopicTags" class="tag-cloud"></div>
+            <div class="tag-input-row">
+              <input id="muteTopicInput" placeholder="输入屏蔽主题，回车" onkeydown="if(event.key==='Enter'){event.preventDefault();addRuleTag('mute_topic',this.value);this.value='';}">
+              <button class="ghost" onclick="addRuleTag('mute_topic',$('muteTopicInput').value);$('muteTopicInput').value='';">添加</button>
+            </div>
+            <div style="margin-top:10px">
+              <b style="font-size:12px;color:#344054">🟡 轻度降权词 (扣15分但不归档)：</b>
+              <div id="demoteKwTags" class="tag-cloud" style="min-height:32px;margin:4px 0 6px"></div>
+              <div class="tag-input-row">
+                <input id="demoteKwInput" placeholder="输入降权词，回车" oninput="simulateInput('demote_kw',this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();addRuleTag('demote_kw',this.value);this.value='';}">
+                <button class="ghost" onclick="addRuleTag('demote_kw',$('demoteKwInput').value);$('demoteKwInput').value='';">添加</button>
+              </div>
+              <div id="demoteSimBox" class="sim-box" hidden></div>
+            </div>
+            <div class="ctype-switches" style="margin-top:12px">
+              <b>内容类型全局开关：</b>
+              <label class="switch-label"><input type="checkbox" id="muteDealSwitch" onchange="toggleMuteType('deal',this.checked)"> 一键屏蔽促销优惠 (deal)</label>
+              <label class="switch-label"><input type="checkbox" id="muteEntertainmentSwitch" onchange="toggleMuteType('entertainment',this.checked)"> 一键屏蔽纯娱乐 (entertainment)</label>
+              <b style="margin-top:8px">Reactflux 原生沉浸动作：</b>
+              <label class="switch-label"><input type="checkbox" id="autoStarSwitch" onchange="toggleAutoAction('auto_star',this.checked)"> ⭐ 高分好文自动加星标 (≥75分)</label>
+              <label class="switch-label"><input type="checkbox" id="autoSilenceSwitch" onchange="toggleAutoAction('auto_silence',this.checked)"> 🗑️ 垃圾广告自动标已读 (≤25分)</label>
+            </div>
+          </div>
+        </div>
+        <div id="ruleHitsDrawer" class="rule-hits-drawer" hidden></div>
+      </section>
+
+      <!-- Autonomous Policy Signals -->
+      <section class="console-section">
+        <div class="section-head">
+          <div><div class="eyebrow">AUTONOMOUS DECISIONS</div><h2>AI 自主分流态势</h2><p>基于你的主动规则与多维内容质量，AI 目前的自动分流分布情况。</p></div>
+          <span id="autonomousBadge" class="mode-pill">—</span>
+        </div>
+        <div id="autonomousSummary" class="level">加载中…</div>
+        <div id="autonomousReasons" class="decision-list"><div class="loading-row">加载中…</div></div>
+      </section>
+    </div>
+
+    <!-- TAB 3: 订阅源综合治理 (Feed Governance) -->
+    <div id="tab-feeds" class="tab-view">
+      <section class="console-section">
+        <div class="section-head">
+          <div><div class="eyebrow">FEED GOVERNANCE</div><h2>订阅源综合治理 (三合一)</h2><p>各订阅源的抓取连通性、24h 延迟趋势、内容质量评级以及 AI 推荐权重一体化管理。</p></div>
+          <div class="head-actions">
+            <button type="button" class="ghost" style="color:#067647;border-color:#a6f4c5;font-weight:700" onclick="triggerHealNow(this)">🩺 立即体检与自愈</button>
+            <button type="button" class="ghost" onclick="toggleHealLogsDrawer()">📜 自愈巡检日志</button>
+            <span id="feedPolicyBadge" class="mode-pill">—</span>
+          </div>
+        </div>
+        <div class="feed-controls-bar">
+          <input id="feedSearchInput" class="search feed-search" placeholder="🔍 过滤订阅源名称或 URL..." oninput="filterFeedsList()">
+          <div class="filter-chips" id="feedStatusChips">
+            <button type="button" class="chip-btn active" onclick="filterFeedsStatus('all', this)">全部 (<span id="feedCountAll">0</span>)</button>
+            <button type="button" class="chip-btn" onclick="filterFeedsStatus('warn', this)">⚠️ 需关注 (<span id="feedCountWarn">0</span>)</button>
+            <button type="button" class="chip-btn" onclick="filterFeedsStatus('healthy', this)">🟢 健康 (<span id="feedCountHealthy">0</span>)</button>
+            <button type="button" class="chip-btn" onclick="filterFeedsStatus('disabled', this)">🔴 已停用 (<span id="feedCountDisabled">0</span>)</button>
+          </div>
+        </div>
+        <div id="healLogsDrawer" class="rule-hits-drawer" hidden></div>
+        <div id="unifiedFeedList" class="feed-policy-list"><div class="loading-row">加载中…</div></div>
+      </section>
+    </div>
+
+    <!-- TAB 4: 探索与系统 (Explore & System) -->
+    <div id="tab-explore" class="tab-view">
+      <!-- Search -->
+      <section class="console-section">
+        <div class="section-head"><div><div class="eyebrow">SEARCH</div><h2>全文文章检索</h2><p>Miniflux 数据库全文检索 + 本地 AI 评分混合引擎。</p></div></div>
+        <div class="search-bar">
+          <input id="searchInput" class="search" placeholder="输入任意中英文关键词检索全文…" onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="ghost" onclick="doSearch()">搜索</button>
+        </div>
+        <div id="searchResults" class="search-results"><div class="empty-console"><b>输入关键词开始搜索</b><span>支持标题与正文匹配</span></div></div>
+      </section>
+
+      <!-- Trends -->
+      <section class="console-section">
+        <div class="section-head"><div><div class="eyebrow">TRENDS</div><h2>趋势与热点动量</h2><p>全网主题 7 天热度动量（↑ 上升）、热门关键词与内容类型分布。</p></div><span id="trendsBadge" class="mode-pill">—</span></div>
+        <div id="trendsContent" class="trends-content"><div class="loading-row">加载中…</div></div>
+      </section>
+
+      <!-- Fast-Path Analytics Card -->
+      <section class="console-section">
+        <div class="section-head"><div><div class="eyebrow">EFFICIENCY</div><h2>⚡ 算力节约与前置熔断看板</h2><p>通过前置启发式规则直接阻断明显促销垃圾，跳过大模型总结以节约算力。</p></div><span id="fastPathRatioBadge" class="mode-pill">—</span></div>
+        <div class="efficiency-grid">
+          <div class="eff-card"><small>前置熔断拦截</small><b id="effFastCount">0 篇</b><span>0 Token 极速阻断</span></div>
+          <div class="eff-card"><small>大模型深度研判</small><b id="effLlmCount">0 篇</b><span>六维质量分析</span></div>
+          <div class="eff-card"><small>算力耗时加速比</small><b>~40x 极速</b><span>本地纳秒级过滤</span></div>
+          <div class="eff-card"><small>节省 API 费用</small><b id="effTokensSaved">约 0 Tokens</b><span>完全避免大模型开销</span></div>
+        </div>
+      </section>
+
+      <!-- Curated Feed & MCP -->
+      <section class="console-section">
+        <div class="section-head"><div><div class="eyebrow">INTEGRATIONS</div><h2>外部集成服务 (Curated RSS & MCP)</h2><p>供外部阅读器订阅的高分纯净源，以及为 Cursor/Claude 等 AI 提供的 MCP 工具桥接。</p></div></div>
+        <div class="integration-cards">
+          <div class="int-card">
+            <b>📰 高价值精选 RSS 源 (/rss/curated)</b>
+            <p>只包含 AI 评分 ≥70 的优质文章，无广告、无水文。适合订阅至任何 RSS 客户端。</p>
+            <div class="copy-box">
+              <code id="curatedUrlText">/rss/curated?min_score=70</code>
+              <button type="button" class="ghost" onclick="copyCuratedUrl(this)">📋 复制订阅链接</button>
+            </div>
+          </div>
+          <div class="int-card">
+            <b>🤖 MCP 工具桥接清单 (18 个只读工具)</b>
+            <p>支持外部 AI (Claude Desktop, Cursor) 直接读取 RSS 评分、趋势与分析结果。</p>
+            <a class="text-link" href="/api/mcp/manifest" target="_blank">查看 /api/mcp/manifest 清单 ›</a>
+          </div>
+        </div>
+        <div id="mcpContent" class="mcp-content" style="margin-top:12px"><div class="loading-row">加载中…</div></div>
+      </section>
+
+      <!-- Structured Ops Dashboard -->
+      <section class="console-section">
+        <div class="section-head">
+          <div><div class="eyebrow">AUDIT & SYSTEM</div><h2>底层运维监控与数据一致性</h2><p>PostgreSQL、Outbox 队列、每日备份与容器内置自洽巡检数据。</p></div>
+          <button type="button" class="ghost" onclick="toggleAuditDetails(this)">展开审计细节</button>
+        </div>
+        <div class="audit-grid">
+          <div><small>存储一致性</small><b id="auditConsistency">—</b><span>JSONL / PostgreSQL 自动对齐</span></div>
+          <div><small>Feed 监控采样</small><b id="auditFeed">—</b><span>10 分钟心跳</span></div>
+          <div><small>每日灾备</small><b id="auditBackup">—</b><span>每日 · 14 天保留</span></div>
+          <div><small>运行环境</small><b id="auditImages">—</b><span>Debian Slim · Waitress</span></div>
+        </div>
+        <pre id="auditDetails" class="audit-details" hidden>加载中…</pre>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Dialog for Rules Backup / Import -->
+<dialog id="rulesDialog" class="console-dialog">
+  <div class="dialog-content">
+    <div class="dialog-header">
+      <h3 id="dialogTitle">规则备份与导入</h3>
+      <button type="button" class="ghost" onclick="$('rulesDialog').close()">✕</button>
+    </div>
+    <p id="dialogDesc" class="dialog-desc">在此备份或粘贴你导出的 JSON 规则：</p>
+    <textarea id="rulesJsonArea" class="dialog-textarea" spellcheck="false"></textarea>
+    <div class="dialog-footer">
+      <button type="button" class="ghost" onclick="$('rulesDialog').close()">取消</button>
+      <button type="button" class="ghost save-rules-btn" id="dialogSubmitBtn" onclick="submitDialogAction()">确认保存</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast" class="toast"></div>
+<script src="/static/js/console.js?v=163"></script>
+</body>
+</html>
