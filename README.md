@@ -1,11 +1,11 @@
 <div align="center">
 
-# ⚡ RSS AI
+# ⚡ FluxPilot
 
 **新一代全自动 RSS 智能信息流基础设施**  
-*All-in-One Autonomous RSS Intelligence & Clean Reading Infrastructure*
+*FluxPilot: All-in-One Autonomous RSS Intelligence & Clean Reading Infrastructure*
 
-[![Docker Multi-Arch](https://img.shields.io/badge/Docker-Multi--Arch%20(amd64%20%7C%20arm64)-blue?logo=docker)](https://github.com/ailiksr/rss-ai)
+[![Docker Multi-Arch](https://img.shields.io/badge/Docker-Multi--Arch%20(amd64%20%7C%20arm64)-blue?logo=docker)](https://github.com/ailiksr/FluxPilot)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11-yellow?logo=python)](https://python.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue?logo=postgresql)](https://postgresql.org)
@@ -65,9 +65,9 @@
 ### 1. 准备配置文件
 下载生产编排文件并复制配置模板：
 ```bash
-mkdir -p rss-ai && cd rss-ai
-curl -fsSL https://raw.githubusercontent.com/ailiksr/rss-ai/main/compose.yml -o compose.yml
-curl -fsSL https://raw.githubusercontent.com/ailiksr/rss-ai/main/.env.example -o .env
+mkdir -p fluxpilot && cd fluxpilot
+curl -fsSL https://raw.githubusercontent.com/ailiksr/FluxPilot/main/compose.yml -o compose.yml
+curl -fsSL https://raw.githubusercontent.com/ailiksr/FluxPilot/main/.env.example -o .env
 ```
 
 ### 2. 配置环境变量
@@ -126,6 +126,32 @@ docker compose up -d
  │ └── Image Proxy (防盗链多级缓存图片代理)                    │
  └─────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 🔄 自动化更新 (Watchtower & Portainer 部署)
+
+### 方案 A：使用 Watchtower 全自动静默更新 (推荐)
+本项目镜像预置了 Watchtower 标签支持，仅对业务层（`miniflux-ai` 和 `image-proxy`）进行平滑自动更新，同时保护底层 PostgreSQL 数据库不被盲目重启：
+```yaml
+# 在宿主机运行 Watchtower
+docker run -d \
+  --name watchtower \
+  --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  containrrr/watchtower \
+  --interval 3600 \
+  --cleanup \
+  --label-enable
+```
+当云端发布新版本时，Watchtower 将自动拉取新镜像并平滑重启业务容器，**所有数据与自愈规则完好继承，零人工介入**。
+
+### 方案 B：在 Portainer Stacks 中原生自动更新
+在 Portainer 中新建 Stack 时：
+1. 部署模式选择 **Repository (Git)**；
+2. 填入仓库地址：`https://github.com/ailiksr/FluxPilot`；
+3. Compose 路径填入：`compose.yml`；
+4. 开启 **Automatic Updates**（定时轮询或配置 Webhook），GitHub 有新更新时 Portainer 自动重构拉取！
 
 ---
 

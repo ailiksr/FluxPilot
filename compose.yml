@@ -23,8 +23,10 @@ services:
     networks: [rss]
 
   image-proxy:
-    image: ghcr.io/ailiksr/rss-ai-image-proxy:${TAG:-latest}
+    image: ghcr.io/ailiksr/fluxpilot-image-proxy:${TAG:-latest}
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     init: true
     read_only: true
     tmpfs:
@@ -85,8 +87,10 @@ services:
     networks: [rss]
 
   miniflux-ai:
-    image: ghcr.io/ailiksr/rss-ai-worker:${TAG:-latest}
+    image: ghcr.io/ailiksr/fluxpilot-worker:${TAG:-latest}
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     init: true
     read_only: true
     tmpfs:
