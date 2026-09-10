@@ -1,5 +1,8 @@
+name: fluxpilot
+
 services:
   postgres:
+    container_name: fluxpilot-postgres
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
@@ -17,6 +20,7 @@ services:
     networks: [rss]
 
   image-proxy:
+    container_name: fluxpilot-image-proxy
     image: ghcr.io/ailiksr/fluxpilot-image-proxy:${TAG:-latest}
     restart: unless-stopped
     environment:
@@ -36,6 +40,7 @@ services:
     networks: [rss]
 
   miniflux:
+    container_name: fluxpilot-miniflux
     image: miniflux/miniflux:2.2.3
     restart: unless-stopped
     depends_on:
@@ -65,6 +70,7 @@ services:
     networks: [rss]
 
   miniflux-ai:
+    container_name: fluxpilot-worker
     image: ghcr.io/ailiksr/fluxpilot-worker:${TAG:-latest}
     restart: unless-stopped
     depends_on:
@@ -98,6 +104,7 @@ services:
     networks: [rss]
 
   reactflux:
+    container_name: fluxpilot-reactflux
     image: electh/reactflux:latest
     restart: unless-stopped
     depends_on:
