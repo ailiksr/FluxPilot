@@ -17,7 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [rss]
+    networks: [fluxpilot-net]
 
   image-proxy:
     container_name: fluxpilot-image-proxy
@@ -37,7 +37,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-    networks: [rss]
+    networks: [fluxpilot-net]
 
   miniflux:
     container_name: fluxpilot-miniflux
@@ -67,7 +67,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-    networks: [rss]
+    networks: [fluxpilot-net]
 
   miniflux-ai:
     container_name: fluxpilot-worker
@@ -101,7 +101,11 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-    networks: [rss]
+    networks:
+      fluxpilot-net:
+        aliases:
+          - miniflux-ai
+          - fluxpilot-worker
 
   reactflux:
     container_name: fluxpilot-reactflux
@@ -112,8 +116,8 @@ services:
         condition: service_healthy
     ports:
       - "${PORT_REACTFLUX:-13000}:2000"
-    networks: [rss]
+    networks: [fluxpilot-net]
 
 networks:
-  rss:
-    name: rss
+  fluxpilot-net:
+    name: fluxpilot-net
