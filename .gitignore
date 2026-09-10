@@ -5,6 +5,7 @@
 miniflux-api-key
 config.yml
 config.yaml
+AI_HANDOVER.md
 
 # Application runtime data & storage
 data/
